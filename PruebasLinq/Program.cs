@@ -10,7 +10,23 @@ internal class Program
         //TestFilterToSqlData();
         //TestFileXml();
         //TestSelectNamesUsersAdults();
-        TestSelectManyMeses();
+        //TestSelectManyMeses();
+        TestBookOrderByTitles();
+    }
+
+    private static void TestBookOrderByTitles()
+    {
+        XDocument doc = XDocument.Load("../../../../PruebasLinq/Books.xml");
+        var titles = from book in doc.Descendants("book")
+                     select book.Element("title")!.Value;
+        var titles = doc.Descendants("book")
+                        .Select(book => book.Element("title")!.Value);
+
+        Console.WriteLine("Titulos de Libros:");
+        foreach (var title in titles)
+        {
+            Console.WriteLine(title);
+        }
     }
 
     private static void TestSelectManyMeses()
