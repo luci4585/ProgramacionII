@@ -1,4 +1,4 @@
-﻿
+﻿using Microsoft.EntityFrameworkCore;
 using System.Xml.Linq;
 
 internal class Program
@@ -8,14 +8,55 @@ internal class Program
         //TestEvenNumbers();
         //TestFilterObjects();
         //TestFilterToSqlData();
-        TestFileXml();
+        //TestFileXml();
+        //TestSelectNamesUsersAdults();
+        TestSelectManyMeses();
+    }
+
+    private static void TestSelectManyMeses()
+    {
+        List<string[]> monthList = new List<string[]>
+        {
+            new string[] { "Enero", "Febrero" },
+            new string[] { "Marzo", "Abril", "Mayo","Junio" },
+            new string[] {"Julio"}
+        };
+
+        var allMonths = monthList.SelectMany(months => months);
+        Console.WriteLine("Lista de meses:");
+        foreach (var month in allMonths)
+        {
+            Console.WriteLine(month);//Output: Enero, Febrero, Marzo...
+        }
+        Console.WriteLine("Mostramos todos los meses juntos, separados por comas, usando select");
+        string AllMonthsList = string.Join(", ", allMonths);
+    }
+
+    private static void TestSelectNamesUsersAdults()
+    {
+        using (var context = new MyDbContext())
+        {
+            var userNames = context.Users
+                             .Where(u => u.Age >= 18)
+                             .Select(u => u.Name)
+                             .ToList();
+            Console.WriteLine("Nombres de usuarios adultos:");
+            foreach (var name in userNames)
+            {
+                Console.WriteLine(name);
+            }
+        }
     }
 
     private static void TestFileXml()
     {
         XDocument doc = XDocument.Load("../../../../PruebasLinq/Books.xml");
-        var titles = from Book in doc.Descendants("title").Value;
+        //var titles = from book in doc.Descendants("book")
+        //             select book.Element("title")!.Value;
+        var titles = doc.Descendants("book")
+                        .Select(book => book.Element("title")!.Value);
 
+        Console.WriteLine("Titulos de Libros:");
         foreach (var title in titles)
         {
             Console.WriteLine(title);
@@ -26,11 +67,17 @@ internal class Program
     {
         using (var context = new MyDbContext())
         {
-            var query = from user in context.Users
-                        where user.Age > 18
-                        select user;
+            var allUsers = context.Users.ToList();
+            var userAdults = context.Users.Where(u => u.Age >= 18).ToList();
 
-            foreach (var user in query)
+            Console.WriteLine("Imprimo todos los usuarios");
+            foreach (var user in allUsers)
+            {
+                Console.WriteLine($"{user.Name} edad:{user.Age}");
+            }
+
+            Console.WriteLine("Imprimo usuarios mayores de 18 años");
+            foreach (var user in userAdults)
             {
                 Console.WriteLine(user.Name);
             }
