@@ -11,19 +11,23 @@ internal class Program
         //TestFileXml();
         //TestSelectNamesUsersAdults();
         //TestSelectManyMeses();
-        TestBookOrderByTitles();
+        //TestBookOrderByTitles();
     }
-
+    //
     private static void TestBookOrderByTitles()
     {
         XDocument doc = XDocument.Load("../../../../PruebasLinq/Books.xml");
-        var titles = from book in doc.Descendants("book")
-                     select book.Element("title")!.Value;
+
         var titles = doc.Descendants("book")
+                        .OrderBy(book => book.Element("title")!.Value)
                         .Select(book => book.Element("title")!.Value);
 
+        var titlesTwo = from b in doc.Descendants("book")
+                        orderby b.Element("title")!.Value
+                        select b.Element("title")!.Value;
+
         Console.WriteLine("Titulos de Libros:");
-        foreach (var title in titles)
+        foreach (var title in titlesTwo)
         {
             Console.WriteLine(title);
         }
@@ -36,7 +40,7 @@ internal class Program
             new string[] { "Enero", "Febrero" },
             new string[] { "Marzo", "Abril", "Mayo","Junio" },
             new string[] {"Julio"}
-        };
+        }; 
 
         var allMonths = monthList.SelectMany(months => months);
         Console.WriteLine("Lista de meses:");
@@ -56,10 +60,15 @@ internal class Program
                              .Where(u => u.Age >= 18)
                              .Select(u => u.Name)
                              .ToList();
-            Console.WriteLine("Nombres de usuarios adultos:");
-            foreach (var name in userNames)
+
+            var userNamesTwo = from u in context.Users
+                               where u.Age >= 18
+                               select new { name=u.Name, age=u.Age };
+
+            Console.WriteLine("Nombres de usuarios adultosTwo:");
+            foreach (var user in userNamesTwo)
             {
-                Console.WriteLine(name);
+                Console.WriteLine($"{user.name} edad:{user.age}");
             }
         }
     }
@@ -85,6 +94,7 @@ internal class Program
         {
             var allUsers = context.Users.ToList();
             var userAdults = context.Users.Where(u => u.Age >= 18).ToList();
+            var userAdultsTwo= from u in context.Users where u.Age < 18 select u;
 
             Console.WriteLine("Imprimo todos los usuarios");
             foreach (var user in allUsers)
@@ -106,13 +116,17 @@ internal class Program
         var namesWithO = from name in names
                     where name.Contains("o",StringComparison.OrdinalIgnoreCase) 
                     select name;
+
         var namesWith4Characters = from name in names
-                                  where name.Length==4
+                                  where name.Length == 4
                                   select name;
+
+        var names4Two = names.Where(n => n.Length == 4).ToList();
+
         Console.WriteLine("Nombres con O");
         foreach (var name in namesWithO)
         {
-            Console.WriteLine(name); // Output: John, Jane, Joe
+            Console.WriteLine(names4Two); // Output: John, Jane, Joe
         }
         Console.WriteLine("Nombres con 4 caracteres");
         foreach (var name in namesWith4Characters)
