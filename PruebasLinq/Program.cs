@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using InstitutoBack.DataContext;
+using Microsoft.EntityFrameworkCore;
 using System.Xml.Linq;
 
 internal class Program
@@ -12,6 +13,20 @@ internal class Program
         //TestSelectNamesUsersAdults();
         //TestSelectManyMeses();
         //TestBookOrderByTitles();
+        TestGetAlumnosInstituto();
+    }
+
+    private static void TestGetAlumnosInstituto()
+    {
+        using (var context = new InstitutoContext())
+        {
+            var alumnos = context.alumnos.ToList();
+            foreach (var item in alumnos)
+            {
+                Console.WriteLine(item.ApellidoNombre);
+
+            }
+        }
     }
     //
     private static void TestBookOrderByTitles()
